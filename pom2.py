@@ -1,6 +1,7 @@
 #pom2 uses second-order markov chains
 import random
 import util
+import time
 
 
 
@@ -84,8 +85,12 @@ def gTFD_smartTermination(dist1, dist2, length):
 		if i < 1:
 			next = util.sample(dist1[last])
 		else:
-			next = util.sample(dist2[lastpair])
+			try:
+				next = util.sample(dist2[lastpair])
+			except KeyError: #this is a corner case when the lastpair is the last pair in the entire source. backs off to 1st order
+				next = util.sample(dist1[last])
 		lastpair = (last, next)
+		#print "", i, " ", last not in stops
 		last = next
 		wl.append(next)
 		i += 1
@@ -105,13 +110,14 @@ def stitch(wordList):
 		wl.append(w1)
 		i += 1
 	return ' '.join(word for word in wl)
-	
-	
+
+"""	
+st = time.time()	
 words = readWordsAndPunctuation("shakespeare.txt")
 dist1 = learnDistribution1(words)
 dist2 = learnDistribution2(words)
 print gTFD_smartTermination(dist1, dist2, 50)
-
-
+print "elapsed time: ", time.time() - st
+"""
 
 
